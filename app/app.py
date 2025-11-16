@@ -1,40 +1,10 @@
-name: Docker build, push, run, cicd
+from flask import Flask
 
-on:
-  push:
-    branches: ["main"]
+app = Flask(__name__)
 
-jobs:
-  build_push_run:
-    runs-on: ubuntu-latest
+@app.route("/")
+def home():
+    return "Hello from Flask + Docker + GitHub Actions!"
 
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v4
-
-      - name: login docker
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: build image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-app:latest ./app
-
-      # 4. push image to docker hub
-      - name: push image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/flask-app:latest
-
-      # 5. run docker container in pipeline
-      - name: run container
-        run: |
-          docker run -d --name flaskapp -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/flask-app:latest
-          sleep 5
-
-      # 6. test flask app running
-      - name: test flask app
-        run: |
-          curl --retry 5 --retry-delay 2 --fail http://localhost:8080
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
