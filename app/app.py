@@ -1,4 +1,4 @@
-name: Docker CI/CD - Build, Push & Run Container
+name: Docker build, push, run, cicd
 
 on:
   push:
@@ -9,35 +9,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout source code
-      - name: Checkout code
+      # 1. checkout source code
+      - name: checkout code
         uses: actions/checkout@v4
 
-      # 2. Login to Docker Hub
-      - name: Login to Docker Hub
+      # 2. Login to docker Hub
+      - name: login docker
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3. Build Docker image
-      - name: Build Docker Image
+      # 3. build docker image
+      - name: build image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-app:latest ./app
 
-      # 4. Push image to Docker Hub
-      - name: Push Docker Image
+      # 4. push image to docker hub
+      - name: push image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/flask-app:latest
 
-      # 5. Run the image as a container inside GitHub Actions
-      - name: Run Docker Container
+      # 5. run docker container in pipeline
+      - name: run container
         run: |
           docker run -d --name flaskapp -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/flask-app:latest
-          sleep 5  # give the container time to start
+          sleep 5
 
-      # 6. Test the running Flask app using curl
-      - name: Test Flask App
+      # 6. test flask app running
+      - name: test flask app
         run: |
           curl --retry 5 --retry-delay 2 --fail http://localhost:8080
 
