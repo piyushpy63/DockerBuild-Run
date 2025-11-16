@@ -9,18 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. checkout source code
       - name: checkout code
         uses: actions/checkout@v4
 
-      # 2. Login to docker Hub
       - name: login docker
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3. build docker image
       - name: build image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-app:latest ./app
